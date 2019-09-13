@@ -3,33 +3,56 @@ close all;
 clc;
 
 tic;
-%% Par�metros
-x1min=-3; %l�mite inferior
-x1max=3; %l�mite superior
-tp1=0.01; %tama�o de paso
+%% función
+% para n variables, se utiliza el formato x(:,i), donde i es la variable
+% entre 1 y n. 
 
-x2min=-3; %l�mite inferior
-x2max=3; %l�mite superior
-tp2=0.01; %tama�o de paso
+% función x1²+x2⁴+10 deberá escribirse como:
+% 'x(:,1).^2 + x(:,2).^4 + 10'
 
-elementos1=(x1max-x1min+1)/tp1; %Cantidad de n�meros
-nbits1=ceil(log2(elementos1)); %N�mero de bits
+func = '';
 
-elementos2=(x2max-x2min+1)/tp2; %Cantidad de n�meros
-nbits2=ceil(log2(elementos2)); %N�mero de bits
+%% Parámetros
+nv = 2; % Número de variables
+iteraciones = 1000;
+
+%Se pueden tomar valores unitarios o como vectores de n dimensiones. 
+x_min = [0 0]; % x min
+x_max = [1000 5000]; % x max
+tp = [1 2.5]; % tamaño de paso
 
 
-%% Generar la poblaci�n
-np=32; %N�mero de pobladores
+elmnts = (x_max-x_min)./tp+1;
+nbits = ceil(log2(elmnts));
 
-x1=randi([0 2^nbits1-1],np,1); %padres enteros positivos
-x2=randi([0 2^nbits2-1],np,1); %padres enteros positivos
+%% Generar la población
+np=32; % Número de pobladores
+mp = sum(nbits);% ancho matriz pobladores (suma de bits de cada variable)
 
-x1real=(x1max-x1min)*x1/(2^nbits1-1)+x1min; 
-x2real=(x2max-x2min)*x1/(2^nbits2-1)+x2min; 
 
-%Conversi�n de entero a Real
-for k=1:5000
+xe = zeros(np,nv); % matriz de pobladores en enteros positivos (2^n)
+for i=1:nv
+    xe(:,i) = randi([0,2^nbits(i)-1],np,1);
+end
+
+
+xr = zeros(np,nv); % matriz de pobladores con su valor perteneciente a los Reales 
+for i=1:nv
+    xr(:,i) = (x_max(i)-x_min(i)).*xe(:,i)/(2^nbits(i)-1)+x_min(i);
+end
+
+
+
+
+
+
+
+
+
+
+
+%Conversión de entero a Real
+for k=1:iteraciones
 %     y=-(x1real+10.125).^2+50; %Evaluaci�n
     y=-(20 + x1real.^2 + x2real.^2 - 10*cos(2*pi*x1real) - 10*cos(2*pi*x2real))
     yprom(k)=mean(y);
@@ -90,7 +113,7 @@ for k=1:5000
 end   
    
 plot(yprom)
-y=-(20 + x1real.^2 + x2real.^2 - 10*cos(2*pi*x1real) - 10*cos(2*pi*x2real))
+y=-(20 + x1real.^2 + x2real.^2 - 10*cos(2*pi*x1real) - 10*cos(2*pi*x2real));
 cromosoma=[y x1 x1real x2 x2real];
 
 [val,ind]=max(y);
@@ -98,3 +121,6 @@ cromosoma=[y x1 x1real x2 x2real];
 disp(['x1= ' num2str(cromosoma(ind,3)) 'x1= ' num2str(cromosoma(ind,5)) ' y= ' num2str(-val)])
 
 toc;
+
+
+
