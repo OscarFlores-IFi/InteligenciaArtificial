@@ -3,69 +3,65 @@ close all;
 clc;
 
 tic;
-%% función
+%% funciÃ³n
 % para n variables, se utiliza el formato x(:,i), donde i es la variable
 % entre 1 y n. 
 
-% función x1²+x2⁴+10 deberá escribirse como:
+% funciÃ³n x1Â²+x2â�´+10 deberÃ¡ escribirse como:
 % 'x(:,1).^2 + x(:,2).^4 + 10'
 
-func = '';
+func = '-x(:,1).^2 - x(:,2).^2';
 
-%% Parámetros
-nv = 2; % Número de variables
+%% ParÃ¡metros
+nv = 2; % NÃºmero de variables
 iteraciones = 1000;
 
 %Se pueden tomar valores unitarios o como vectores de n dimensiones. 
-x_min = [0 0]; % x min
+x_min = [-1000 -5000]; % x min
 x_max = [1000 5000]; % x max
-tp = [1 2.5]; % tamaño de paso
+tp = [1 2.5]; % tamaÃ±o de paso
 
 
 elmnts = (x_max-x_min)./tp+1;
 nbits = ceil(log2(elmnts));
 
-%% Generar la población
-np=32; % Número de pobladores
+%% Generar la poblaciÃ³n
+np=8; % NÃºmero de pobladores
 mp = sum(nbits);% ancho matriz pobladores (suma de bits de cada variable)
 
 
-xe = zeros(np,nv); % matriz de pobladores en enteros positivos (2^n)
+xe = zeros(np,nv); % X perteneciente a los enteros positivos (2^n)
 for i=1:nv
-    xe(:,i) = randi([0,2^nbits(i)-1],np,1);
+    xe(:,i) = randi([1,2^nbits(i)],np,1);
 end
 
+x = xe.*tp + x_min; % X perteneciente a los reales
 
-xr = zeros(np,nv); % matriz de pobladores con su valor perteneciente a los Reales 
-for i=1:nv
-    xr(:,i) = (x_max(i)-x_min(i)).*xe(:,i)/(2^nbits(i)-1)+x_min(i);
-end
+fx = eval(func); 
 
 
+xb = zeros(np,sum(nbits));
 
-
-
-
-
-
-
-
-
-%Conversión de entero a Real
 for k=1:iteraciones
-%     y=-(x1real+10.125).^2+50; %Evaluaci�n
-    y=-(20 + x1real.^2 + x2real.^2 - 10*cos(2*pi*x1real) - 10*cos(2*pi*x2real))
-    yprom(k)=mean(y);
-    cromosoma=sortrows([y x1 x1real x2 x2real],1);
-    % cromosoma=[x1 x1real y];
-    % cromosoma=sortrows(cromosoma,size(cromosoma,2))
-
-    %% Selecci�n
+    fx = eval(func);
+    cr = sortrows([fx x],1); % cromosoma
+    
+    
+    
+    
+    xb(1:nbits(1)) = de2bi(x(:,1));
+    if nv>1
+        for i=2:nv
+            xb(:,nbits(i-1):nbits(i)) = de2bi(xe(:,i));
+        end
+    end
+    %% Selección.
+       % X en binarios.
     padresbin1=de2bi(cromosoma(np/2+1:np,2),nbits1);
     padresbin2=de2bi(cromosoma(np/2+1:np,2),nbits2);
-    %Selecci�n de mejores y conversi�n
+    %Selecciï¿½n de mejores y conversiï¿½n
 
-    %% Cruzamiento aritm�tico
+    %% Cruzamiento aritmï¿½tico
     for i=1:np/2
         j=i+1;
         if j==np/2+1
@@ -79,7 +75,7 @@ for k=1:iteraciones
         hijobin1=hijobin1(:,1:end-1);
         hijobin2=hijobin2(:,1:end-1);
 
-       %% Mutaci�n
+       %% Mutaciï¿½n
        m=rand();
        if m>=.8
            nhijo=randi(np/2);
