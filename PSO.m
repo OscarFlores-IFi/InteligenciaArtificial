@@ -9,16 +9,22 @@ clc;
 % función x1²+x2⁴+10 deberá escribirse como:
 % 'x(:,1).^2 + x(:,2).^4 + 10'
 
-func= '(0.05^(1/2)*x(:,1).^2 + 0.05^(1/2)*x(:,2).^2 ) + a*max(20000*x(:,1)+30000*x(:,2)-50000,0) - a*min(1000*x(:,1)+3000*x(:,2)-2500,0) - a*min(x(:,1),0) - a*min(x(:,2),0)'
+rest1 = '2*x(:,1) + x(:,2) + 0.5*x(:,3) - 400'
+rest2 = '0.5*x(:,1) + 0.5*x(:,2) + x(:,3) - 100 + eval(rest1)'
+rest3 = '1.5*x(:,2) + 2*x(:,3) - 300 + eval(rest2)'
+
+func = '(x(:,1)+x(:,2)+x(:,3)) - a*min(eval(rest1),0) - a*min(eval(rest2),0) - a*min(eval(rest3),0) - a*min(x(:,1),0) - a*min(x(:,2),0) - a*min(x(:,3),0)'
+
+% func= '(0.05^(1/2)*x(:,1).^2 + 0.05^(1/2)*x(:,2).^2 ) + a*max(20000*x(:,1)+30000*x(:,2)-50000,0) - a*min(1000*x(:,1)+3000*x(:,2)-2500,0) - a*min(x(:,1),0) - a*min(x(:,2),0)'
 
 
 %% Parametros iniciales
-nv = 2; %Numero de variables
-np=2000; %Numero de particulas
+nv = 3; %Numero de variables
+np=1000; %Numero de particulas
 
 
-func_min = [0 0]; %Valor mínimo cerca del cual se espera que converga la función
-func_max = [1 1]; %Valor máximo cerca del cual se espera que converga la función
+func_min = [0 0 0]; %Valor mínimo cerca del cual se espera que converga la función
+func_max = [100 100 100]; %Valor máximo cerca del cual se espera que converga la función
 % func_min/max puede ingresarse como un vector de longitud nv en donde se
 % especifica el min y max de cada variable en su respectiva posicion o se
 % puede ingresar como un escalar general para todas las variables. 
@@ -29,7 +35,7 @@ c2 = 0.01; % Velocidad de convergencia a mínimo local
 a=10000; %Penalización
 
 
-iteraciones = 1500; 
+iteraciones = 5000; 
 % Graficar = true
 Graficar = false
 
@@ -76,9 +82,3 @@ for k=1:iteraciones
     vx = vx+c1*rand()*(xg-x)+c2*rand()*(xl-x);
     x = x + vx;
 end
-
-
-
-
-
-
