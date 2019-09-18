@@ -24,8 +24,8 @@ x_max = [10000 50000]; % x max
 tp = [1 2]; % tamanio de paso
 
 
-elmnts = (x_max-x_min)./tp+1;
-nbits = ceil(log2(elmnts));
+elmnts = (x_max-x_min)./tp+1; % Elementos 
+nbits = ceil(log2(elmnts)); % Numero de bits
 
 %% Generar la poblacion
 np=256; % Numero de pobladores
@@ -34,7 +34,7 @@ mp = sum(nbits);% ancho matriz pobladores (suma de bits de cada variable)
 
 xe = zeros(3/2*np,nv); % X perteneciente a los enteros positivos (2^n)
 for i=1:nv
-    xe(:,i) = randi([1,2^nbits(i)-1],3/2*np,1);
+    xe(:,i) = randi([1,2^nbits(i)-1],3/2*np,1); % X enteros
 end
 
 x = xe.*tp + x_min; % X perteneciente a los reales
@@ -43,7 +43,6 @@ acum = cumsum([1 nbits]); % acumulados en binarios
 xb = zeros(3/2*np,sum(nbits)); % x en binarios
 hb = zeros(np,sum(nbits)); % hijos binarios
 he = zeros(np,nv); % hijos enteros
-selh = zeros(np,sum(nbits));
 
 hist = zeros(iteraciones,1);
 
@@ -68,8 +67,8 @@ for k=1:iteraciones
     
     [out, idx] = sort(fx);    
 %     pb = xb(idx,:); % todos los padres en binario  
-    p = x(idx(np+1:end),:);
-    pe = xe(idx(np+1:end),:);
+    p = x(idx(np+1:end),:); % Padres
+    pe = xe(idx(np+1:end),:); % Padres enteros
     pb = xb(idx(np+1:end),:); % la mitad de los padres (los mejores)
    
     hist(k) = mean(out(np:end));
