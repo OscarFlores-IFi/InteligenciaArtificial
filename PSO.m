@@ -6,25 +6,20 @@ clc;
 % para n variables, se utiliza el formato x(:,i), donde i es la variable
 % entre 1 y n. 
 
-% función x1²+x2⁴+10 deberá escribirse como:
+% función x1²+x2?+10 deberá escribirse como:
 % 'x(:,1).^2 + x(:,2).^4 + 10'
+     
+rest1 = '20000*x(:,1)+30000*x(:,2)-50000';
+rest2 = '1000*x(:,1)+3000*x(:,2)-2500';
 
-rest1 = '2*x(:,1) + x(:,2) + 0.5*x(:,3) - 400'
-rest2 = '0.5*x(:,1) + 0.5*x(:,2) + x(:,3) - 100 + eval(rest1)'
-rest3 = '1.5*x(:,2) + 2*x(:,3) - 300 + eval(rest2)'
-
-func = '(x(:,1)+x(:,2)+x(:,3)) - a*min(eval(rest1),0) - a*min(eval(rest2),0) - a*min(eval(rest3),0) - a*min(x(:,1),0) - a*min(x(:,2),0) - a*min(x(:,3),0)'
-
-% func= '(0.05^(1/2)*x(:,1).^2 + 0.05^(1/2)*x(:,2).^2 ) + a*max(20000*x(:,1)+30000*x(:,2)-50000,0) - a*min(1000*x(:,1)+3000*x(:,2)-2500,0) - a*min(x(:,1),0) - a*min(x(:,2),0)'
-
-
+func = '(0.05^(1/2).*x(:,1).^2 + 0.05^(1/2).*x(:,2).^2 +  0.10*x(:,1).*x(:,2)) + a*max(eval(rest1),0) - a*min(eval(rest2),0) - a*min(x(:,1),0) - a*min(x(:,2),0)';
 %% Parametros iniciales
-nv = 3; %Numero de variables
+nv = 2; %Numero de variables
 np=1000; %Numero de particulas
 
 
-func_min = [0 0 0]; %Valor mínimo cerca del cual se espera que converga la función
-func_max = [100 100 100]; %Valor máximo cerca del cual se espera que converga la función
+func_min = [0 0]; %Valor mínimo cerca del cual se espera que converga la función
+func_max = [1 1]; %Valor máximo cerca del cual se espera que converja la función
 % func_min/max puede ingresarse como un vector de longitud nv en donde se
 % especifica el min y max de cada variable en su respectiva posicion o se
 % puede ingresar como un escalar general para todas las variables. 
@@ -36,8 +31,8 @@ a=10000; %Penalización
 
 
 iteraciones = 5000; 
-% Graficar = true
-Graficar = false
+Graficar = true
+%Graficar = false
 
 %% PSO
 x = rand(np,nv).*(func_max-func_min)+func_min; % Posición de inicio de x
@@ -65,12 +60,12 @@ for k=1:iteraciones
     disp(['f(x) = ' num2str(fxg)])
     
     %Determinar los mejores locales
-    fxl(fxl<fx)=fx(fxl<fx);
+    fxl(fxl<fx) = fx(fxl<fx);
+    xl(fxl<fx) = x(fxl<fx);
 
     % Graficar
 	if Graficar && nv==2
         plot(xg(1), xg(2), 'go', x(:,1), x(:,2), 'b.')
-%         axis([-5 5 -5 5]);
         axis([func_min(1) func_max(1) func_min(2) func_max(2)])
         title(['x1=' num2str(xg(1)) ' x2=' num2str(xg(2)) ' y=' num2str(fxg)])
         xlabel('x1')
