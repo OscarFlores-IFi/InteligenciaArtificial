@@ -9,26 +9,32 @@ tic;
 % para n variables, se utiliza el formato x(:,i), donde i es la variable
 % entre 1 y n. Algoritmo genetico busca maximizar. 
 
-% funcion x1^2+x2^2+10 debera¡ escribirse como:
+% funcion x1^2+x2^4+10 debera¡ escribirse como:
 % 'x(:,1).^2 + x(:,2).^4 + 10'
 
-func = '-x(:,1).^2 - x(:,2).^2';
+a = 100000;
+
+rest1 = '2000*x(:,1)+3000*x(:,2)-50000';
+rest2 = '1000*x(:,1)+3000*x(:,2)-2500';
+
+func = '-((0.05^(1/2).*x(:,1).^2 + 0.05^(1/2).*x(:,2).^2 +  0.10*x(:,1).*x(:,2)) + a*max(eval(rest1),0) - a*min(eval(rest2),0) - a*min(x(:,1),0) - a*min(x(:,2),0))';
+
 
 %% Parametros
 nv = 2; % Numero de variables
 iteraciones = 10000;
 
 %Se pueden tomar valores unitarios o como vectores de n dimensiones. 
-x_min = [-10000 -50000]; % x min
-x_max = [10000 50000]; % x max
-tp = [1 2]; % tamanio de paso
+x_min = [0 0]; % x min
+x_max = [1 1]; % x max
+tp = [.001 .001]; % tamanio de paso
 
 
 elmnts = (x_max-x_min)./tp+1; % Elementos 
 nbits = ceil(log2(elmnts)); % Numero de bits
 
 %% Generar la poblacion
-np=256; % Numero de pobladores
+np=16; % Numero de pobladores
 mp = sum(nbits);% ancho matriz pobladores (suma de bits de cada variable)
 
 
@@ -47,20 +53,13 @@ he = zeros(np,nv); % hijos enteros
 hist = zeros(iteraciones,1);
 
 
-
-
-
-
-
-
-
 %% Algoritmo Genetico
 
 for k=1:iteraciones
     fx = eval(func); % evaluamos la funcion
     
     for i=1:nv
-       xb(:,acum(i):acum(i+1)-1) = de2bi(xe(:,i)); % convertimos a binarios
+       xb(:,acum(i):acum(i+1)-1) = de2bi(xe(:,i),nbits(i)); % convertimos a binarios
     end
     
     %% Seleccion.
@@ -91,7 +90,7 @@ for k=1:iteraciones
     h = he.*tp + x_min; % hijos
 
     x = [h;p]; % Vector x a evaluar.
-    xe = (x - x_min)./tp;
+    xe = floor((x - x_min)./tp);
 end   
 
 disp(fx)   
