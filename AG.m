@@ -14,27 +14,29 @@ tic;
 
 a = 100000;
 
-rest1 = '2000*x(:,1)+3000*x(:,2)-50000';
-rest2 = '1000*x(:,1)+3000*x(:,2)-2500';
+r1 = 'max(3*x(:,1) + 6*x(:,2) + 2*x(:,3) - 600, 0)';
+r2 = '- min(x(:,1) + x(:,2) + x(:,3) - 240, 0)';
+r3 = ' - min(x(:,1),0) - min(x(:,2)-1,0) - min(x(:,3),0) + max(x(:,3)-140,0)';
+rest = 'eval(r1) + eval(r2) + eval(r3)';
 
-func = '-((0.05^(1/2).*x(:,1).^2 + 0.05^(1/2).*x(:,2).^2 +  0.10*x(:,1).*x(:,2)) + a*max(eval(rest1),0) - a*min(eval(rest2),0) - a*min(x(:,1),0) - a*min(x(:,2),0))';
+func = '(4*x(:,1) + 12*x(:,2) + 2*x(:,3)) - a*eval(rest)';
 
 
 %% Parametros
-nv = 2; % Numero de variables
+nv = 3; % Numero de variables
 iteraciones = 10000;
 
 %Se pueden tomar valores unitarios o como vectores de n dimensiones. 
-x_min = [0 0]; % x min
-x_max = [1 1]; % x max
-tp = [.001 .001]; % tamanio de paso
+x_min = [0 1 0]; % x min
+x_max = [500 500 500]; % x max
+tp = [.01 .01 .01]; % tamanio de paso
 
 
 elmnts = (x_max-x_min)./tp+1; % Elementos 
 nbits = ceil(log2(elmnts)); % Numero de bits
 
 %% Generar la poblacion
-np=16; % Numero de pobladores
+np=32; % Numero de pobladores
 mp = sum(nbits);% ancho matriz pobladores (suma de bits de cada variable)
 
 

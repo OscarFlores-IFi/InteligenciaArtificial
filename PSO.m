@@ -8,18 +8,16 @@ clc;
 
 % función x1²+x2?+10 deberá escribirse como:
 % 'x(:,1).^2 + x(:,2).^4 + 10'
-     
-rest1 = '20000*x(:,1)+30000*x(:,2)-50000';
-rest2 = '1000*x(:,1)+3000*x(:,2)-2500';
-
-func = '(0.05^(1/2).*x(:,1).^2 + 0.05^(1/2).*x(:,2).^2 +  0.10*x(:,1).*x(:,2)) + a*max(eval(rest1),0) - a*min(eval(rest2),0) - a*min(x(:,1),0) - a*min(x(:,2),0)';
+a = 100000
+rest = 'a*max(x(:,1)-5,0) - a*min(x(:,1)+5,0) + a*max(x(:,2)-5,0) - a*min(x(:,2)+5,0) + a*max(x(:,1) + x(:,2),0) ';
+func = '(2*x(:,1)) + eval(rest)';
 %% Parametros iniciales
 nv = 2; %Numero de variables
 np=1000; %Numero de particulas
 
 
-func_min = [0 0]; %Valor mínimo cerca del cual se espera que converga la función
-func_max = [1 1]; %Valor máximo cerca del cual se espera que converja la función
+func_min = [-5 -5]; %Valor mínimo cerca del cual se espera que converga la función
+func_max = [5 5]; %Valor máximo cerca del cual se espera que converja la función
 % func_min/max puede ingresarse como un vector de longitud nv en donde se
 % especifica el min y max de cada variable en su respectiva posicion o se
 % puede ingresar como un escalar general para todas las variables. 
