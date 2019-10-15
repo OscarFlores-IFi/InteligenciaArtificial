@@ -1,0 +1,147 @@
+clear all;
+close all;
+clc;
+format Bank;
+%% Cargar los datos
+data = xlsread('Datos_Proyecto2.xls', 'datos'); %Carga los datos del archivo
+TEST = xlsread('Datos_Proyecto2.xls', 'prediccion'); %Carga los datos del archivo
+
+%% Limpieza de datos
+data = data(logical(1-sum(isnan(data),2)),:); % Eliminar todas las filas que contengan NaN
+%Normalización de datos
+for i=1:size(data,2)-1
+     TEST(:,i) = (TEST(:,i)-mean(data(:,i)))/std(data(:,i));
+     data(:,i) = (data(:,i)-mean(data(:,i)))/std(data(:,i)); % Lo estandarizamos debido a que tenemos variables muy grandes y otras muy pequeñas. 
+   
+end
+
+%%
+%Matriz de correlación
+Correlacion = corr(data(:,1:end-1));
+
+%%
+% X = data(:,1:end-1); % NO JALA. Modelos demasiado malos en cualquier caso
+% X = data(:,[1 2 3 4 7 9]); % 
+% TEST = TEST(:,[1 2 3 4 7 9]);
+% X = data(:,[1 2 3 7 9]); % 
+% TEST = TEST(:,[1 2 3 7 9]);
+X = data(:,[3 7 9]); % 
+TEST = TEST(:,[3 7 9]);
+Y = data(:,end);
+n = size(X,1); %Cantidad de datos
+
+%% Separación de datos y propuesta de modelo Xa
+% 
+% cv = cvpartition(Y,'holdout',0.25);
+% % holdout: divide aleatoriamente las observaciones en un conjunto de datos
+% % de entrenamiento y prueba, usando la información de la clase del grupo.
+% % Datos de entrenamiento.
+% 
+% Xtrain = X(training(cv),:);
+% Ytrain = Y(training(cv));
+% % Datos de prueba.
+% Xtest = X(test(cv),:);
+% Ytest = Y(test(cv));
+% 
+% 
+% %% Búsqueda de grado de polinomio
+% hist = zeros(5,4);
+% for i=1:3
+%     ngrado = i;
+%     Xa=func_polinomio(Xtrain,ngrado);
+%     W=zeros(size(Xa,2),1); %Pesos iniciales %iniciar de ceros (tamaño(xa, num columnas),en columna)
+%     [J,dJdW]=fun_costob(W,Xa,Ytrain); %Calculo de J y W
+% 
+%     options=optimset('GradObj','on','MaxIter',1000);
+%     [Wopt,Jopt]=fminunc(@(W)fun_costob(W,Xa,Ytrain),W,options);
+% 
+%     % TRAIN 
+%     V=Xa*Wopt;
+%     Yg_train=1./(1+exp(-V));
+%     Yg_train=round(Yg_train); %Redondea a unos y ceros pero deja en números
+% 
+%     [Accu_train, Prec_train, Rec_train] = desempenio(Yg_train,Ytrain);
+%     hist(i,:) = [Accu_train Prec_train Rec_train sum([Accu_train, Prec_train, Rec_train])];
+% end 
+% plot(hist)
+% 
+% 
+% 
+% 
+% 
+% 
+% %% Regresión Logística 
+% ngrado = 2;
+% Xa=func_polinomio(Xtrain,ngrado);
+% W=zeros(size(Xa,2),1); %Pesos iniciales %iniciar de ceros (tamaño(xa, num columnas),en columna)
+% [J,dJdW]=fun_costob(W,Xa,Ytrain); %Calculo de J y W
+% 
+% options=optimset('GradObj','on','MaxIter',1000);
+% [Wopt,Jopt]=fminunc(@(W)fun_costob(W,Xa,Ytrain),W,options);
+% 
+% % %% TRAIN 
+% 
+% V=Xa*Wopt;
+% Yg_train=1./(1+exp(-V));
+% Yg_train=round(Yg_train); %Redondea a unos y ceros pero deja en números
+% 
+% [Accu_train, Prec_train, Rec_train] = desempenio(Yg_train,Ytrain)
+% 
+% % %% Graficar matriz de confusión
+% confmat_train = confusionmat(Ytrain, Yg_train)
+% confusionchart(confmat_train)
+% 
+% 
+% 
+% % %% TEST
+% Xatest=func_polinomio(Xtest,ngrado);
+% Vtest=Xatest*Wopt;
+% Yg_test=1./(1+exp(-Vtest));
+% Yg_test=round(Yg_test); %Redondea a unos y ceros pero deja en números
+% 
+% 
+% [Accu_test, Prec_test, Rec_test]  = desempenio(Yg_test,Ytest)
+% 
+% % %% Graficar matriz de confusión
+% confmat_test = confusionmat(Ytest, Yg_test)
+% confusionchart(confmat_test)
+
+
+%% ########################## PREDICCION ##################################
+
+
+
+% ########################### PREDICCION ##################################
+
+
+
+% ########################### PREDICCION ##################################
+
+%% Regresión Logística 
+
+ngrado = 3;
+Xa=func_polinomio(X,ngrado);
+W=zeros(size(Xa,2),1); %Pesos iniciales %iniciar de ceros (tamaño(xa, num columnas),en columna)
+[J,dJdW]=fun_costob(W,Xa,Y); %Calculo de J y W
+
+options=optimset('GradObj','on','MaxIter',1000);
+[Wopt,Jopt]=fminunc(@(W)fun_costob(W,Xa,Y),W,options);
+
+% %% TRAIN 
+
+V=Xa*Wopt;
+Yg_train=1./(1+exp(-V));
+Yg_train=round(Yg_train); %Redondea a unos y ceros pero deja en números
+
+[Accu_train, Prec_train, Rec_train] = desempenio(Yg_train,Y) % Desempenio.
+
+% %% Graficar matriz de confusión
+confmat_train = confusionmat(Y, Yg_train)
+confusionchart(confmat_train)
+
+
+%% TEST 
+V=func_polinomio(TEST,ngrado)*Wopt;
+Yg_test=1./(1+exp(-V));
+
+Yg_test=round(Yg_test)
