@@ -1,7 +1,4 @@
-
-%% ########################################################################
-%  ############################## Problema 1 ##############################
-%  ########################################################################
+%% Problema 1
 
 % Cargamos datos de entrenamiento
 data = xlsread('CCPP.xlsx'); %Carga los datos del archivo
@@ -11,45 +8,145 @@ AT=21.42
 AP=1015.76
 RH=43.08
 V=43.79
-Test = [AT V AP RH]
+TEST = [AT V AP RH]
 
 %% Adaline no estandarizado 
 % Separamos datos de modelo no estandarizado
 X = data(:,1:end-1);
 Y = data(:,end);
 
+ngrado = 1;
+Xa = func_polinomio(X,ngrado);
+
 % Entrenamos modelo
-W = pinv(X'*X)*X'*Y;
+W = pinv(Xa'*Xa)*Xa'*Y;
 
 % Probamos modelo 
+Test = func_polinomio(TEST, ngrado);
 Pred = Test*W
 
 
+%% Adaline no estandarizado 2
+% Separamos datos de modelo no estandarizado
+X = data(:,1:end-1);
+Y = data(:,end);
 
-%% Adaline estandarizado 
-% Estandarizamos los datos 
-data_norm = zeros(size(data));
+ngrado = 2;
+Xa = func_polinomio(X,ngrado);
 
-Mu = mean(data,1)
-Std = std(data)
-Test(5) = 1;
-Test_norm = ones(1,size(Test,2));
-for i=1:size(data,2)
-    data_norm(:,i) = (data(:,i)-Mu(i))/Std(i);  
-    Test_norm(i) = (Test(i)-Mu(i))/Std(i);
+% Entrenamos modelo
+W = pinv(Xa'*Xa)*Xa'*Y;
+
+% Probamos modelo 
+Test = func_polinomio(TEST, ngrado);
+Pred = Test*W
+
+%% Problema 2
+clear
+clc
+data = xlsread('Datainmuno.xlsx'); %Carga los datos del archivo
+test = data((sum(isnan(data),2)==1),1:end-1)
+data = data(not(sum(isnan(data),2)>0),:)
+
+X = data(:,1:end-1)
+Y = data(:,end)
+
+% Regresión logística. 
+ngrado = 1
+Xa=func_polinomio(X,ngrado);
+Test = func_polinomio(test,ngrado); 
+
+W=zeros(size(Xa,2),1); %Pesos iniciales
+[J,dJdW]=fun_costob(W,Xa,Y); %Calculo de J y W
+
+options=optimset('GradObj','on','MaxIter',1000);
+
+[Wopt,Jopt]=fminunc(@(W)fun_costob(W,Xa,Y),W,options);
+
+% Simulaci?n del modelo obtenido
+V=Xa*Wopt;
+Yg=1./(1+exp(-V));
+Yg=round(Yg);
+
+[Accu Prec Rec] = desempenio(Yg,Y)
+confusionchart(confusionmat(Yg,Y))
+
+%%
+pred = 1./(1+exp(-Test*Wopt))
+% 
+% pred =
+% 
+%     0.9183
+%     0.9383
+%     0.9588
+
+%% Problema 3 
+clc;
+clear all;
+close all;
+
+data = xlsread('KnowledgeModeling.xls', 'Training_Data' )
+data = data';
+%% Entrenamiento de la red. 
+Iteraciones = 10
+
+Jcost = zeros(Iteraciones,1);
+NNN = zeros(Iteraciones,1);
+for iter=2:size(Jcost)+1
+    neuronas = iter;
+    red = competlayer(neuronas);
+    red.trainParam.epochs = 1000;
+    red = train(red,data) ;
+    
+    % Probar el modelo con los datos. 
+    Y = vec2ind(red(data))
+    grupos = unique(Y)
+
+    % Calculo de J 
+    mat = red.IW{:};
+
+    J = 0 ;
+    for i = 1:size(grupos,2)
+        temp = data(:,Y==grupos(1,i))';
+        g = 0;
+        for j=1:size(temp,1)
+            g = g + norm(temp - mat(grupos(i),:));
+        end
+        J = J + g/j;
+    end
+    Jcost(iter-1) = J/size(grupos,2)
+    NNN(iter-1) = size(unique(Y),2)
 end
-Test(5) = [];
-Test_norm(5) = [];
-
-Xnorm = data_norm(:,1:end-1);
-Ynorm = data_norm(:,end);
-
-Wnorm = pinv(Xnorm'*Xnorm)*Xnorm'*Ynorm;
-
-Pred_norm = Test_norm*Wnorm*Std(end)+Mu(end)
+%%
+plot([2:Iteraciones+1],Jcost)
+%%
+plot([2:Iteraciones+1],NNN)
+%% Elejimos cantidad de Neuronas para la clasificación. 
 
 
-%% ########################################################################
-%  ############################## Problema 2 ##############################
-%  ########################################################################
+neuronas = 6;
+red = competlayer(neuronas);
+red.trainParam.epochs = 1000;
+red = train(red,data) ;
+
+% Probar el modelo con los datos. 
+Y = vec2ind(red(data))
+grupos = unique(Y)
+
+% Calculo de J 
+mat = red.IW{:};
+
+J = 0 ;
+for i = 1:size(grupos,2)
+    temp = data(:,Y==grupos(1,i))';
+    g = 0;
+    for j=1:size(temp,1)
+        g = g + norm(temp - mat(grupos(i),:));
+    end
+    J = J + g/j;
+end
+J = J/i
+
+
+
 
