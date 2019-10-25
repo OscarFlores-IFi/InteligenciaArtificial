@@ -84,8 +84,12 @@ pred = 1./(1+exp(-Test*Wopt))
 clc;
 clear all;
 close all;
+%%
+data = xlsread('KnowledgeModeling.xls', 'Training_Data')
+data = data';
+%%
 
-data = xlsread('KnowledgeModeling.xls', 'Training_Data' )
+data = xlsread('KnowledgeModeling.xls', 'Clasifica' )
 data = data';
 
 %% Entrenamiento de la red. 
@@ -105,7 +109,8 @@ for iter=2:size(Jcost)+1
     NNN(iter-1) = i
 end
 %%
-plot([2:Iteraciones+1],Jcost)
+Jcost_escala = (1+(Jcost-max(Jcost))/((max(Jcost)-min(Jcost))))*(max(NNN)-min(NNN))+min(NNN)
+plot([2:Iteraciones+1],Jcost_escala,'r',[2:Iteraciones+1],NNN,'b*')
 %%
 plot([2:Iteraciones+1],NNN)
 %% Elejimos cantidad de Neuronas para la clasificación. 
@@ -118,8 +123,13 @@ red = train(red,data) ;
 % Probar el modelo con los datos. 
 Y = vec2ind(red(data))
 grupos = unique(Y)
+%% Guardar modelo (para no tener que correrlo otra vez)
+save red.mat red
 
+%% Cargar modelo guardado 
+load red.mat
 %% Calculo de J 
 [J,i] = CalculoJ(data,red) % i es la cantidad de neuronas que fueron utilizadas. 
-
+%% Graficar Y
+plot(vec2ind(red(data)))
 
