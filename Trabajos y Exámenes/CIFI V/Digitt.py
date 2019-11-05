@@ -19,7 +19,7 @@ reporte = mylib.dqr(data)
 stat = data.drop(columns=['reasson', 'payment_status','created_at'])
 sts = mylib.dqr(stat)
 
-Quant = stat.loc[:,['income', 'age', 'score','icc', 'tenure','rate', 'total_debt', 'amount_to_be_lend']]
+Quant = stat.loc[:,['income', 'age', 'score','icc','rate', 'total_debt', 'amount_to_be_lend']]
 #Dummies = stat.loc[:,['gender', 'housing_type','occupancy_type','level_of_studies','state','marital_status']]
 Dummies = stat.loc[:,['gender', 'housing_type','occupancy_type','level_of_studies','marital_status']]
 Y = pd.get_dummies(stat.status)
