@@ -76,7 +76,8 @@ for i=1:4
         red = competlayer(neuronas);
         red.trainParam.epochs = 500;
         red = train(red,data) ;
-
+        eval(sprintf('Red.m%d.n%d = red',i,neuronas))
+        
         % Calculo de J 
         [J, nnn] = CalculoJ(data,red);
 
