@@ -25,6 +25,8 @@ X4 = [income age score total_debt amount_to_be_lend gender housing_type level_of
 for k=1:4
     eval(sprintf('s = size(X%d,2)',k))
     for i=1:s
+        eval(sprintf('Avg.X%d(i) = mean(X%d(:,i))',k,k)
+        
         eval(sprintf('X%d(:,i) = (X%d(:,i)-mean(X%d(:,i)))/std(X%d(:,i))',k,k,k,k))
         
     end
