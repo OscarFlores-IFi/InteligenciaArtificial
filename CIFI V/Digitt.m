@@ -74,7 +74,7 @@ for i=1:4
         data = data';
         neuronas = nneuronas(iter);
         red = competlayer(neuronas);
-        red.trainParam.epochs = 500;
+        red.trainParam.epochs = 1000;
         red = train(red,data) ;
         eval(sprintf('Red.m%d.n%d = red',i,neuronas))
         
