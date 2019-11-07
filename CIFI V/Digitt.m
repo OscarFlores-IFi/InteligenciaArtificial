@@ -46,7 +46,7 @@ for k=1:2
     end
 end
 
-%% PerceptrÃ³n
+%% Perceptrón
 for k=1:2
     ngrado = k;
     for i=1:4
@@ -64,24 +64,24 @@ for k=1:2
     end
 end
 %% Competitivas 
-nneuronas = [5 10 15 25 40 65 105]
+nneuronas = [5 10 15 25 40 65 105];
 
 for i=1:4
     Jcost = zeros(size(nneuronas));
     NNN = zeros(size(nneuronas));
     for iter=1:size(nneuronas,2)
         eval(sprintf('data = X.m%dg%d',i,1))
-        data = data'
+        data = data';
         neuronas = nneuronas(iter);
         red = competlayer(neuronas);
         red.trainParam.epochs = 500;
         red = train(red,data) ;
 
         % Calculo de J 
-        [J, nnn] = CalculoJ(data,red)
+        [J, nnn] = CalculoJ(data,red);
 
-        Jcost(iter) = J
-        NNN(iter) = nnn
+        Jcost(iter) = J;
+        NNN(iter) = nnn;
     end
     eval(sprintf('FuncCosto.m%d = Jcost',i))
     eval(sprintf('Nfinal.m%d = NNN',i))
@@ -89,6 +89,3 @@ end
 
 %% Guardar modelos
 save Digitt.mat
-
-
-
