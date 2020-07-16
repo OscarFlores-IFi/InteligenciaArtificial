@@ -1,41 +1,55 @@
+%% PSO (busca minimizar J.)
 clear all;
 close all;
 clc;
-% Se optimizará el volumen que se puede conseguir al transformar una hoja
-% de papel en un prisma trapezoidal con tapa abierta. 
+% Se optimizará una cubeta, esta deberá tener un volumen de 20cm3, una base
+% de radio 'r', una tapa de radio 'r+1.5' y una altura 'h'. Minimizar
+% costos suponiendo que cuerpo y base cuestan $1/cm2 y tapa $2/cm2
 
 %% Formato para ingresar funciones
 % para n variables, se utiliza el formato x(:,i), donde i es la variable
 % entre 1 y n. 
 
 % función x1²+x2⁴+10 deberá escribirse como:
-% 'x(:,1).^2 + x(:,2).^4 + 10'
-altura = 8.5
-base = 11
-func = '-(x(:,1).*sin(x(:,2)).*(altura-2*(x(:,1)).*sin(x(:,2))).*((base-2*x(:,1))+x(:,1).*cos(x(:,2)))) + a*max(x(:,2)-pi/2,0) + a*max(x(:,1)-base/2,0) + a*max(x(:,1).*sin(x(:,2))-altura/2,0) - min(x(:,1),0) - min(x(:,2),0)'
+% func = 'x(:,1).^2 + x(:,2).^4 + 10'
+
+vol = 'pi/3.*x(:,2).*((x(:,1) + 1.5).^2 + x(:,1).^2 + (x(:,1) + 1.5).*x(:,1))' % Volumen 
+p1 = 'max(20 - eval(vol),0)' % Si volumen < 20
+p2 = 'max(eval(vol) - 20,0)' % Si volumen > 20 
+
+lateral = 'pi * (2*x(:,1) + 1.5) .* (x(:,2).^2 + 1.5^2).^(0.5)'
+tapa = 'pi * (x(:,1) + 1.5).^2'
+base = 'pi * x(:,1).^2'
+
+func = '2 * eval(tapa) + eval(base) + eval(lateral) + a*eval(p1) + a*eval(p2) - a*min(x(:,1),0) - a*min(x(:,2),0)'
+
+% (otras funciones de ejemplo)
+% altura = 8.5
+% base = 11
+% func = '-(x(:,1).*sin(x(:,2)).*(altura-2*(x(:,1)).*sin(x(:,2))).*((base-2*x(:,1))+x(:,1).*cos(x(:,2)))) + a*max(x(:,2)-pi/2,0) + a*max(x(:,1)-base/2,0) + a*max(x(:,1).*sin(x(:,2))-altura/2,0) - min(x(:,1),0) - min(x(:,2),0)'
 % func= '(0.05^(1/2)*x(:,1).^2 + 0.05^(1/2)*x(:,2).^2 ) + a*max(20000*x(:,1)+30000*x(:,2)-50000,0) - a*min(1000*x(:,1)+3000*x(:,2)-2500,0) - a*min(x(:,1),0) - a*min(x(:,2),0)'
 
 
 %% Parametros iniciales
 nv = 2; %Numero de variables
-np=1500; %Numero de particulas
+np=10000; %Numero de particulas
 
 
 func_min = [0 0]; %Valor mínimo cerca del cual se espera que converga la función
-func_max = [base/2 pi/2]; %Valor máximo cerca del cual se espera que converga la función
+func_max = [5 5]; %Valor máximo cerca del cual se espera que converga la función
 % func_min/max puede ingresarse como un vector de longitud nv en donde se
 % especifica el min y max de cada variable en su respectiva posicion o se
 % puede ingresar como un escalar general para todas las variables. 
 
 
-c1 = 0.005; % Velocidad de convergencia a mínimo global
-c2 = 0.005; % Velocidad de convergencia a mínimo local
+c1 = 0.1; % Velocidad de convergencia a mínimo global
+c2 = 0.1; % Velocidad de convergencia a mínimo local
 a=1000000; %Penalización
 
 
-iteraciones = 2000; 
-% Graficar = true
-Graficar = false
+iteraciones = 1000; 
+Graficar = true
+% Graficar = false
 
 %% PSO
 x = rand(np,nv).*(func_max-func_min)+func_min; % Posición de inicio de x
@@ -49,6 +63,8 @@ xg = x(ind,:);
 
 
 for k=1:iteraciones
+    disp(['iteracion: ' num2str(k)])
+    
     %Mínimo de la función y su posición
     fx = eval(func);
     [val,ind]=min(fx); 
@@ -81,7 +97,8 @@ for k=1:iteraciones
     x = x + vx;
 end
 
-
+% Mejor x: [0.9894 1.9813] si tapa cuesta lo mismo que base y sup. lateral
+% Mejor x: [1.1846 1.6298] si tapa cuesta el doble que base y sup. lateral
 
 
 
